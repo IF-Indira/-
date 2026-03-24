@@ -1,0 +1,112 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Client {
+private:
+    string fullName, phone, email;
+    int contactCount;
+
+public:
+    // Конструкторы
+    Client() : fullName("Не указано"), phone("000-000-0000"), 
+               email("unknown@example.com"), contactCount(0) {
+        cout << "Создан клиент (по умолчанию)" << endl;
+    }
+    
+    Client(string name, string tel, string mail) : 
+           fullName(name), phone(tel), email(mail), contactCount(0) {
+        cout << "Создан клиент: " << fullName << endl;
+    }
+    
+    // Деструктор
+    ~Client() {
+        cout << "Клиент \"" << fullName << "\" удален" << endl;
+    }
+    
+    // Геттеры
+    string getFullName() { return fullName; }
+    string getPhone() { return phone; }
+    string getEmail() { return email; }
+    int getContactCount() { return contactCount; }
+    
+    // Сеттеры с валидацией
+    void setFullName(string name) {
+        if (name.length() >= 2) fullName = name;
+        else cout << "Ошибка: ФИО слишком короткое" << endl;
+    }
+    
+    void setPhone(string tel) {
+        int digits = 0;
+        for (char c : tel) if (isdigit(c)) digits++;
+        if (digits >= 10) phone = tel;
+        else cout << "Ошибка: телефон должен содержать 10+ цифр" << endl;
+    }
+    
+    void setEmail(string mail) {
+        if (mail.find('@') != string::npos) email = mail;
+        else cout << "Ошибка: email должен содержать @" << endl;
+    }
+    
+    void setContactCount(int count) {
+        if (count >= 0) contactCount = count;
+        else cout << "Ошибка: количество не может быть отрицательным" << endl;
+    }
+    
+    // Основные методы
+    void registerContact() {
+        contactCount++;
+        cout << "Новое обращение. Всего: " << contactCount << endl;
+    }
+    
+    bool isActive(int threshold) {
+        if (threshold <= 0) {
+            cout << "Ошибка: порог должен быть > 0" << endl;
+            return false;
+        }
+        return contactCount >= threshold;
+    }
+    
+    void printInfo() {
+        cout << "Клиент: " << fullName << " | Тел: " << phone 
+             << " | Email: " << email << " | Обращений: " << contactCount << endl;
+    }
+};
+
+int main() {
+    setlocale(0, "Russian");
+    
+    // Создание объектов
+    Client defaultClient;
+    Client client1("Петров Петр", "+79991234567", "petrov@mail.ru");
+    
+    // Демонстрация методов
+    cout << "\n--- Демонстрация ---\n";
+    client1.printInfo();
+    client1.registerContact();
+    client1.registerContact();
+    cout << "Активен (порог 3)? " << (client1.isActive(3) ? "Да" : "Нет") << endl;
+    
+    // Валидация сеттеров
+    cout << "\n--- Проверка валидации ---\n";
+    Client client2;
+    client2.setFullName("А");           // ошибка
+    client2.setFullName("Сидоров Сидор");
+    client2.setPhone("123");            // ошибка
+    client2.setPhone("+79998887766");
+    client2.setEmail("mail.ru");        // ошибка
+    client2.setEmail("sidorov@mail.ru");
+    client2.setContactCount(-5);        // ошибка
+    client2.setContactCount(10);
+    client2.printInfo();
+    
+    // Дополнительная демонстрация isActive
+    cout << "\n--- Проверка активности ---\n";
+    Client client3("Иванова Анна", "89161234567", "anna@mail.ru");
+    client3.registerContact();
+    client3.registerContact();
+    client3.registerContact();
+    cout << "Активен (порог 3)? " << (client3.isActive(3) ? "Да" : "Нет") << endl;
+    
+    return 0;
+}
